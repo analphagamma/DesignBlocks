@@ -1,6 +1,8 @@
 import turtle
+import json
+import os.path
 from math import sqrt
-from random import choice, randint
+from random import randint
 from time import sleep
 from itertools import product
 
@@ -205,12 +207,29 @@ class Player(object):
         game.play_end()
 
     def save_board(self):
-        print('Saving board.')
-        turtle.textinput('Save as...', 'Please enter name.')
-        pass
+        '''Asks for filename
+           if empty string entered -> no save
+           if filename already exists -> asks again
+           else -> saves file in json format'''
+           
+        filename = turtle.textinput('Save board?', 'To save please enter name.')
+        while True:
+            if filename == '':
+                print('Not saving.')
+                return
+        
+            if not os.path.isfile(filename+'.json'):
+                with open(filename+'.json', 'w+') as f: json.dump(board_layout, f)
+                print('Board saved.')
+                return
+            else:
+                print('Filename already exists.')
+                filename = turtle.textinput('Save as...', 'To save please enter name.\nTo exit without saving press ENTER.')
+                
+            
 
     def load_board(self):
-        print('Loading board.')
+        
         pass
 
 
@@ -234,21 +253,19 @@ class Game(object):
         return self.play_game()
 
     def play_game(self):
-        def exit_game(*args):
-            self.play_end()
-        
+                
         board.setup_board()
 
         # defining mouse and keyboard actions
         turtle.onscreenclick(player.left_click, 1)
         turtle.onscreenclick(player.middle_click, 2)
         turtle.onscreenclick(player.right_click, 3)
-        turtle.onkeypress(player.save_board, 's')
-        turtle.onkeypress(player.load_board, 'l')
+        
         turtle.onkeypress(board.setup_board, 'r')
         turtle.listen()
 
     def play_end(self):
+        player.save_board()
         turtle.clear()
         turtle.penup()
         turtle.home()
@@ -271,7 +288,7 @@ def main():
 
 if __name__ == '__main__':
     scr = turtle.Screen()
-    board = Board(150)
+    board = Board(100)
     player = Player()
     game = Game()
 
