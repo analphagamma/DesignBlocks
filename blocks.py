@@ -8,24 +8,23 @@ from itertools import product
 COLORS = ['blue', 'white', 'red', 'yellow',
           'blue-yellow', 'red-white']
 
-ORIENTATIONS = ['up1', 'up2', 'down1', 'down2']
 
 board_layout = {0: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         1: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         2: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         3: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         4: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         5: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         6: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         7: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         8: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         9: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         10: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         11: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         12: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         13: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         14: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-         15: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None}}
+                1: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                2: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                3: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                4: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                5: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                6: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                7: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                8: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                9: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                10: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                11: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                12: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                13: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                14: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
+                15: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None}}
 
 class Board(object):
     '''represents the whole playing field with all the tiles and their
@@ -59,14 +58,19 @@ class Board(object):
             if color_choice in [0,1,2,3]:
                 orientation = None
             else:
-                orientation = choice(ORIENTATIONS)
+                orientation = randint(0,3)
             
             tile = Tile(i, location, color_choice, orientation)
             tile.draw_tile()
 
 
 class Tile(object):
-    '''This class handles the behaviour of individual tiles'''
+    '''This class handles the behaviour of individual tiles
+
+       tile_id -> int - to identify the tile
+       location -> tuple of tuples ((x0, y0), (xn, yn)) - bottom-left and top-right coordinates of tile
+       color_code -> int - index of COLORS list
+       orientation -> int or None - # 0: up1, 1:up2, 2:down1, 3:down2, None:filled tile'''
 
     def __init__(self, tile_id, location, color_code, orientation):
         self.tile_id = tile_id
@@ -74,14 +78,19 @@ class Tile(object):
         self.color_code = color_code
         self.orientation = orientation
 
+        # translating color code to actual color and splitting double colors
         self.fill_color = COLORS[self.color_code].split('-')
+
         print(self.tile_id, self.location, COLORS[self.color_code], self.orientation) #for testing purposes
+        # storing tile attributes in dictionary
         board_layout[self.tile_id] = {'tile_location': self.location, 'tile_color': self.color_code, 'tile_orientation': self.orientation}
 
+        # initialising turtle position
         turtle.penup()
         turtle.goto(self.location[0])
         turtle.pendown()
         turtle.seth(0)
+        turtle.ht()
 
     def draw_tile(self):
 
@@ -99,6 +108,11 @@ class Tile(object):
         def draw_square_split(self, col1, col2):
             '''draws 2 triangles forming a square filled with the 2 given colors'''
 
+            # if the orientation in the mirror image of the default
+            # swap the colors
+            if self.orientation in [1, 3]:
+                col1, col2 = col2, col1
+            
             turtle.color(col1)
             turtle.begin_fill()
             turtle.seth(0)
@@ -121,16 +135,8 @@ class Tile(object):
         if self.orientation == None:
             draw_square_filled(self, self.fill_color)
         else:
-            print("COLOR:", self.fill_color)
             draw_square_split(self, self.fill_color[0], self.fill_color[1])
 
-    def change_color(self, color):
-        self.color = color
-        self.draw_tile(self)
-        print('Changing color')
-
-    def rotate_tile(self):
-        print('Rotating tile')
 
 
 class Player(object):
@@ -157,15 +163,19 @@ class Player(object):
         tile_no = self.check_click(x, y)
         if tile_no is not None:
             print('Changing color at Tile No.{}'.format(tile_no))
+            # picking next color in list
             new_color = board_layout[tile_no]['tile_color'] + 1
+            # to avoid IndexError
             if new_color > 5:
                 new_color = 0
             print('NEW COLOR: ', new_color)
+            # filled or split
             if new_color in [0,1,2,3]:
                 orientation = None
             else:
-                orientation = choice(ORIENTATIONS)
+                orientation = randint(0,3)
             print('ORIENTATION: ', orientation)
+            # re-initialise tile
             tile = Tile(tile_no, board.locations[tile_no], new_color, orientation)
             tile.draw_tile()
 
@@ -175,13 +185,33 @@ class Player(object):
            
         tile_no = self.check_click(x, y)
         if tile_no is not None:
+            if board_layout[tile_no]['tile_orientation'] == None:
+                print('Can\'t rotate filled tile')
+                return
+            
             print('Rotating Tile No.{}'.format(tile_no))
+            color = board_layout[tile_no]['tile_color']
+            new_orientation = board_layout[tile_no]['tile_orientation'] + 1
+            if new_orientation > 4:
+                new_orientation = 0
+            print('NEW ORIENTATION ', new_orientation)
+            tile = Tile(tile_no, board.locations[tile_no], color, new_orientation)
+            tile.draw_tile()
             
     def middle_click(self, x, y):
         '''Takes user to end screen.'''
         
         print('Exiting.')
         game.play_end()
+
+    def save_board(self):
+        print('Saving board.')
+        turtle.textinput('Save as...', 'Please enter name.')
+        pass
+
+    def load_board(self):
+        print('Loading board.')
+        pass
 
 
 class Game(object):
@@ -195,7 +225,7 @@ class Game(object):
         welcome_lines = ['Welcome to Blocks!',
                          'a game of creativity',
                          'no highscores, no competition',
-                         'just playing :)']
+                         'just play :)']
         for line in welcome_lines:
             turtle.clear()
             turtle.write(line, align='center', font=('Helvetica', 20, 'bold'))
@@ -208,10 +238,15 @@ class Game(object):
             self.play_end()
         
         board.setup_board()
-        
+
+        # defining mouse and keyboard actions
         turtle.onscreenclick(player.left_click, 1)
         turtle.onscreenclick(player.middle_click, 2)
         turtle.onscreenclick(player.right_click, 3)
+        turtle.onkeypress(player.save_board, 's')
+        turtle.onkeypress(player.load_board, 'l')
+        turtle.onkeypress(board.setup_board, 'r')
+        turtle.listen()
 
     def play_end(self):
         turtle.clear()
@@ -236,7 +271,7 @@ def main():
 
 if __name__ == '__main__':
     scr = turtle.Screen()
-    board = Board(100)
+    board = Board(150)
     player = Player()
     game = Game()
 
