@@ -10,23 +10,8 @@ from itertools import product
 COLORS = ['blue', 'white', 'red', 'yellow',
           'blue-yellow', 'red-white']
 
+board_layout = {}
 
-board_layout = {0: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                1: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                2: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                3: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                4: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                5: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                6: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                7: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                8: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                9: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                10: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                11: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                12: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                13: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                14: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None},
-                15: {'tile_location': '', 'tile_color': 0, 'tile_orientation': None}}
 
 class Board(object):
     '''represents the whole playing field with all the tiles and their
@@ -54,7 +39,7 @@ class Board(object):
 
         turtle.ht()
         turtle.home()
-        turtle.mode("logo")
+        
         for i, location in enumerate(self.locations):
             color_choice = randint(0,5)
             if color_choice in [0,1,2,3]:
@@ -114,26 +99,47 @@ class Tile(object):
             # swap the colors
             if self.orientation in [1, 3]:
                 col1, col2 = col2, col1
-            
-            turtle.color(col1)
-            turtle.begin_fill()
-            turtle.seth(0)
-            turtle.fd(board.scale)
-            turtle.lt(135)
-            turtle.fd(sqrt(2*(board.scale ^ board.scale)))
-            turtle.lt(135)
-            turtle.fd(board.scale)
-            turtle.end_fill()
+            # two different orientations
+            if self.orientation in [0, 1]:
+                turtle.color(col1)
+                turtle.begin_fill()
+                turtle.seth(0)
+                turtle.fd(board.scale)
+                turtle.rt(135)
+                turtle.fd(sqrt(2*(board.scale**2)))
+                turtle.rt(135)
+                turtle.fd(board.scale)
+                turtle.end_fill()
 
-            turtle.rt(90)
+                turtle.rt(90)
+                turtle.fd(board.scale)
 
-            turtle.color(col2)
-            turtle.begin_fill()
-            turtle.fd(board.scale)
-            turtle.rt(90)
-            turtle.fd(board.scale)
-            turtle.end_fill()
+                turtle.color(col2)
+                turtle.begin_fill()
+                turtle.rt(90)
+                turtle.fd(board.scale)
+                turtle.rt(90)
+                turtle.fd(board.scale)
+                turtle.end_fill()
+            else:
+                turtle.color(col1)
+                turtle.begin_fill()
+                turtle.seth(90)
+                turtle.fd(board.scale)
+                turtle.lt(90)
+                turtle.fd(board.scale)
+                turtle.lt(135)
+                turtle.fd(sqrt(2*(board.scale**2)))
+                turtle.end_fill()
 
+                turtle.rt(135)
+                turtle.color(col2)
+                turtle.begin_fill()
+                turtle.fd(board.scale)
+                turtle.rt(90)
+                turtle.fd(board.scale)
+                turtle.end_fill()
+                
         if self.orientation == None:
             draw_square_filled(self, self.fill_color)
         else:
@@ -143,9 +149,6 @@ class Tile(object):
 
 class Player(object):
     '''This class contains all player behaviour'''
-    
-    def __init__(self):
-        pass
 
     def check_click(self, x, y):
         '''checks whether the click is within the boundary of any tiles
@@ -206,38 +209,9 @@ class Player(object):
         print('Exiting.')
         game.play_end()
 
-    def save_board(self):
-        '''Asks for filename
-           if empty string entered -> no save
-           if filename already exists -> asks again
-           else -> saves file in json format'''
-           
-        filename = turtle.textinput('Save board?', 'To save please enter name.')
-        while True:
-            if filename == '':
-                print('Not saving.')
-                return
-        
-            if not os.path.isfile(filename+'.json'):
-                with open(filename+'.json', 'w+') as f: json.dump(board_layout, f)
-                print('Board saved.')
-                return
-            else:
-                print('Filename already exists.')
-                filename = turtle.textinput('Save as...', 'To save please enter name.\nTo exit without saving press ENTER.')
-                
-            
-
-    def load_board(self):
-        
-        pass
-
 
 class Game(object):
     '''Game engine'''
-    
-    def __init__(self):
-        pass
 
     def start_game(self):
         turtle.ht()
@@ -253,7 +227,9 @@ class Game(object):
         return self.play_game()
 
     def play_game(self):
-                
+        '''main game sequence
+           sets up board and listens to mouse and keyboard actions'''
+        
         board.setup_board()
 
         # defining mouse and keyboard actions
@@ -264,8 +240,49 @@ class Game(object):
         turtle.onkeypress(board.setup_board, 'r')
         turtle.listen()
 
+    def save_board(self):
+        '''Asks for filename
+           if empty string entered -> no save
+           if filename already exists -> asks again
+           else -> saves file in json format'''
+           
+        filename = turtle.textinput('Save board?', 'To save please enter name.')
+        while True:
+            if filename in ['', None]:
+                print('Not saving.')
+                return
+        
+            if not os.path.isfile(filename+'.json'):
+                with open(filename+'.json', 'w+') as f: json.dump(board_layout, f)
+                print('Board saved.')
+                return
+            else:
+                print('Filename already exists.')
+                filename = turtle.textinput('Save as...', 'To save please enter name.\nTo exit without saving press ENTER.')
+                
+    def load_board(self):
+        '''loads a previously saved board
+           //TODO'''
+
+        filename = turtle.textinput('Load board?', 'Enter name file name to load or leave empty to start a new board')
+        while True:
+            if filename in ['', None]:
+                print('Not loading.')
+                return None
+        
+            if not os.path.isfile(filename+'.json'):
+                with open(filename+'.json', 'r+') as f: board_layout = json.load(f)
+                return board_layout
+            else:
+                print('File doesn\'t exist.')
+                filename = turtle.textinput('Load board?', 'Enter name file name to load or leave empty to start a new board')
+
+
     def play_end(self):
-        player.save_board()
+        '''prompts to save the board,
+           displays exit message and exits'''
+
+        self.save_board()
         turtle.clear()
         turtle.penup()
         turtle.home()
@@ -288,7 +305,8 @@ def main():
 
 if __name__ == '__main__':
     scr = turtle.Screen()
-    board = Board(100)
+    turtle.mode("logo")
+    board = Board(150)
     player = Player()
     game = Game()
 
