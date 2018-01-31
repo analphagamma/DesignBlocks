@@ -1,4 +1,4 @@
-import turtle
+from turtle import *
 import json
 import os.path
 from math import sqrt
@@ -37,8 +37,8 @@ class Board(object):
         '''places the pen in its initial position
            draws the tiles in a 4x4 format filled with random colors'''
 
-        turtle.ht()
-        turtle.home()
+        ht()
+        home()
         
         for i, location in enumerate(self.locations):
             color_choice = randint(0,5)
@@ -73,24 +73,24 @@ class Tile(object):
         board_layout[self.tile_id] = {'tile_location': self.location, 'tile_color': self.color_code, 'tile_orientation': self.orientation}
 
         # initialising turtle position
-        turtle.penup()
-        turtle.goto(self.location[0])
-        turtle.pendown()
-        turtle.seth(0)
-        turtle.ht()
+        penup()
+        goto(self.location[0])
+        pendown()
+        seth(0)
+        ht()
 
     def draw_tile(self):
 
         def draw_square_filled(self, col):
             '''draws a square filled with solid color'''
 
-            turtle.color(col)
-            turtle.begin_fill()
-            turtle.seth(0)
+            color(col)
+            begin_fill()
+            seth(0)
             for i in range(4):
-                turtle.fd(board.scale)
-                turtle.rt(90)
-            turtle.end_fill()
+                fd(board.scale)
+                rt(90)
+            end_fill()
 
         def draw_square_split(self, col1, col2):
             '''draws 2 triangles forming a square filled with the 2 given colors'''
@@ -101,44 +101,44 @@ class Tile(object):
                 col1, col2 = col2, col1
             # two different orientations
             if self.orientation in [0, 1]:
-                turtle.color(col1)
-                turtle.begin_fill()
-                turtle.seth(0)
-                turtle.fd(board.scale)
-                turtle.rt(135)
-                turtle.fd(sqrt(2*(board.scale**2)))
-                turtle.rt(135)
-                turtle.fd(board.scale)
-                turtle.end_fill()
+                color(col1)
+                begin_fill()
+                seth(0)
+                fd(board.scale)
+                rt(135)
+                fd(sqrt(2*(board.scale**2)))
+                rt(135)
+                fd(board.scale)
+                end_fill()
 
-                turtle.rt(90)
-                turtle.fd(board.scale)
+                rt(90)
+                fd(board.scale)
 
-                turtle.color(col2)
-                turtle.begin_fill()
-                turtle.rt(90)
-                turtle.fd(board.scale)
-                turtle.rt(90)
-                turtle.fd(board.scale)
-                turtle.end_fill()
+                color(col2)
+                begin_fill()
+                rt(90)
+                fd(board.scale)
+                rt(90)
+                fd(board.scale)
+                end_fill()
             else:
-                turtle.color(col1)
-                turtle.begin_fill()
-                turtle.seth(90)
-                turtle.fd(board.scale)
-                turtle.lt(90)
-                turtle.fd(board.scale)
-                turtle.lt(135)
-                turtle.fd(sqrt(2*(board.scale**2)))
-                turtle.end_fill()
+                color(col1)
+                begin_fill()
+                seth(90)
+                fd(board.scale)
+                lt(90)
+                fd(board.scale)
+                lt(135)
+                fd(sqrt(2*(board.scale**2)))
+                end_fill()
 
-                turtle.rt(135)
-                turtle.color(col2)
-                turtle.begin_fill()
-                turtle.fd(board.scale)
-                turtle.rt(90)
-                turtle.fd(board.scale)
-                turtle.end_fill()
+                rt(135)
+                color(col2)
+                begin_fill()
+                fd(board.scale)
+                rt(90)
+                fd(board.scale)
+                end_fill()
                 
         if self.orientation == None:
             draw_square_filled(self, self.fill_color)
@@ -214,14 +214,14 @@ class Game(object):
     '''Game engine'''
 
     def start_game(self):
-        turtle.ht()
+        ht()
         welcome_lines = ['Welcome to Blocks!',
                          'a game of creativity',
                          'no highscores, no competition',
                          'just play :)']
         for line in welcome_lines:
-            turtle.clear()
-            turtle.write(line, align='center', font=('Helvetica', 20, 'bold'))
+            clear()
+            write(line, align='center', font=('Helvetica', 20, 'bold'))
             sleep(2)
 
         return self.play_game()
@@ -233,12 +233,12 @@ class Game(object):
         board.setup_board()
 
         # defining mouse and keyboard actions
-        turtle.onscreenclick(player.left_click, 1)
-        turtle.onscreenclick(player.middle_click, 2)
-        turtle.onscreenclick(player.right_click, 3)
+        onscreenclick(player.left_click, 1)
+        onscreenclick(player.middle_click, 2)
+        onscreenclick(player.right_click, 3)
         
-        turtle.onkeypress(board.setup_board, 'r')
-        turtle.listen()
+        onkeypress(board.setup_board, 'r')
+        listen()
 
     def save_board(self):
         '''Asks for filename
@@ -246,7 +246,7 @@ class Game(object):
            if filename already exists -> asks again
            else -> saves file in json format'''
            
-        filename = turtle.textinput('Save board?', 'To save please enter name.')
+        filename = textinput('Save board?', 'To save please enter name.')
         while True:
             if filename in ['', None]:
                 print('Not saving.')
@@ -258,13 +258,13 @@ class Game(object):
                 return
             else:
                 print('Filename already exists.')
-                filename = turtle.textinput('Save as...', 'To save please enter name.\nTo exit without saving press ENTER.')
+                filename = textinput('Save as...', 'To save please enter name.\nTo exit without saving press ENTER.')
                 
     def load_board(self):
         '''loads a previously saved board
            //TODO'''
 
-        filename = turtle.textinput('Load board?', 'Enter name file name to load or leave empty to start a new board')
+        filename = textinput('Load board?', 'Enter name file name to load or leave empty to start a new board')
         while True:
             if filename in ['', None]:
                 print('Not loading.')
@@ -275,7 +275,7 @@ class Game(object):
                 return board_layout
             else:
                 print('File doesn\'t exist.')
-                filename = turtle.textinput('Load board?', 'Enter name file name to load or leave empty to start a new board')
+                filename = textinput('Load board?', 'Enter name file name to load or leave empty to start a new board')
 
 
     def play_end(self):
@@ -283,13 +283,13 @@ class Game(object):
            displays exit message and exits'''
 
         self.save_board()
-        turtle.clear()
-        turtle.penup()
-        turtle.home()
-        turtle.color('black')
-        turtle.ht()
-        turtle.write('Thank you for playing!', align='center', font=('Helvetica', 20, 'bold'))
-        turtle.exitonclick()
+        clear()
+        penup()
+        home()
+        color('black')
+        ht()
+        write('Thank you for playing!', align='center', font=('Helvetica', 20, 'bold'))
+        exitonclick()
 
 
 def main():
@@ -304,11 +304,11 @@ def main():
 
 
 if __name__ == '__main__':
-    scr = turtle.Screen()
-    turtle.mode("logo")
+    scr = Screen()
+    mode("logo")
     board = Board(150)
     player = Player()
     game = Game()
 
     main()
-    turtle.mainloop()
+    mainloop()
