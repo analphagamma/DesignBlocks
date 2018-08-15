@@ -33,13 +33,13 @@ class Board(object):
 
         self.locations = list(zip(lower_coord, upper_coord))
         
-    def setup_board(self):
+    def setup_board(self, tiles=[]):
         '''places the pen in its initial position
            draws the tiles in a 4x4 format filled with random colors'''
 
         ht()
         home()
-        
+
         for i, location in enumerate(self.locations):
             color_choice = randint(0,5)
             if color_choice in [0,1,2,3]:
@@ -47,8 +47,8 @@ class Board(object):
             else:
                 orientation = randint(0,3)
             
-            tile = Tile(i, location, color_choice, orientation)
-            tile.draw_tile()
+            tiles.insert(0, Tile(i, location, color_choice, orientation))
+            Tile(i, location, color_choice, orientation).draw_tile()
 
 
 class Tile(object):
@@ -78,7 +78,19 @@ class Tile(object):
         pendown()
         seth(0)
         ht()
+        
+    def __gt__(self, other):
+        if self.tile_id > other.tile_id:
+            return True
+        else:
+            return False
 
+    def __lt__(self, other):
+        if self.tile_id < other.tile_id:
+            return True
+        else:
+            return False
+            
     def draw_tile(self):
 
         def draw_square_filled(self, col):
