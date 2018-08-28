@@ -9,6 +9,6 @@ The controls are simple:
 - Right click: rotate the block horizontally
 - Middle click: exit the game
 
-When exiting the game asks you whether you want to save your design. The "load" function hasn't been implemented yet but you can still save your creation and one day you will beable to see it again ;)
+When exiting, the game will ask you whether you want to save your design. The "load" function hasn't been implemented yet but you can still save your creation and one day you will be able to see it again ;)
 
 Future plans: I want to add a feature where you can print out your design.
