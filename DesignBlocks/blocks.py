@@ -264,8 +264,8 @@ class Game(object):
                 print('Not saving.')
                 return
         
-            if not os.path.isfile(filename+'.json'):
-                with open(filename+'.json', 'w+') as f: json.dump(board_layout, f)
+            if not os.path.isfile('./saves/'+filename+'.json'):
+                with open('./saves/'+filename+'.json', 'w+') as f: json.dump(board_layout, f)
                 print('Board saved.')
                 return
             else:
@@ -282,8 +282,8 @@ class Game(object):
                 print('Not loading.')
                 return None
         
-            if not os.path.isfile(filename+'.json'):
-                with open(filename+'.json', 'r+') as f: board_layout = json.load(f)
+            if os.path.isfile('./saves/'+filename+'.json'):
+                with open('./saves/'+filename+'.json', 'r+') as f: board_layout = json.load(f)
                 return board_layout
             else:
                 print('File doesn\'t exist.')
@@ -317,7 +317,7 @@ def main():
 
 if __name__ == '__main__':
     scr = Screen()
-    mode("logo")
+    mode('logo')
     board = Board(150)
     player = Player()
     game = Game()
